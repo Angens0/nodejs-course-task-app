@@ -14,7 +14,7 @@ const upload = multer({
     },
     fileFilter(req, file, cb) {
         if(!file.originalname.match(/\.(doc|docx)$/)) {
-            cb(new Error('Please upload a Word document'))
+            return cb(new Error('Please upload a Word document'))
         }
 
         cb(undefined, true)
