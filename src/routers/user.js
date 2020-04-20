@@ -1,6 +1,6 @@
 const express = require('express')
 const multer = require('multer')
-const { ObjectID } = require('mongodb')
+const sharp = require('sharp')
 const User = require('../models/User')
 const auth = require('../middleware/auth')
 const router = express.Router()
@@ -93,7 +93,8 @@ const upload = multer({
 })
 
 router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
-    req.user.avatar = req.file.buffer
+    const buffer = await sharp(req.file.buffer).png().resize({ width: 250, height: 250 }).toBuffer()
+    req.user.avatar = buffer
     await req.user.save()
     res.send()
 }, (error, req, res, next) => {
@@ -114,7 +115,7 @@ router.get('/users/:id/avatar', async (req, res) => {
             throw new Error()
         }
 
-        res.set('Content-Type', 'image/jpg')
+        res.set('Content-Type', 'image/png')
         res.send(user.avatar)
     } catch(error) {
         res.status(404).send()
